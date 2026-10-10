@@ -4,6 +4,9 @@ def main():
     print(f"results+: {a + b}")
     print(f"results-: {a - b}")
     print(f"results*: {a * b}")
-
+    if b !=0:
+        print(f"results/: {a / b}")
+    else:
+        print("/0")
 if __name__ == "__main__":
     main()
