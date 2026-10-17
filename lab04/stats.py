@@ -51,3 +51,20 @@ def read_valid(lines: list[str]) -> list[dict]:
 
     return records
 
+def average_by_city(records: list[dict]) -> dict:
+    
+    totals = {}
+    counts = {}
+
+    for record in records:
+        city = record["city"]
+        temperature = record["temperature"]
+        totals[city] = totals.get(city, 0.0) + temperature
+        counts[city] = counts.get(city, 0) + 1
+
+    averages = {}
+    for city in totals:
+        avg = totals[city] / counts[city]
+        averages[city] = round(avg, 1)
+
+    return averages
