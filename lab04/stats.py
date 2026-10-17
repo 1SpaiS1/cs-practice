@@ -68,3 +68,13 @@ def average_by_city(records: list[dict]) -> dict:
         averages[city] = round(avg, 1)
 
     return averages
+
+    def warmest_city(records: list[dict]) -> str:
+    
+    averages = average_by_city(records)
+    if not averages:
+        return ""
+
+  
+    ordered = sorted(averages.items(), key=lambda kv: (-kv[1], kv[0]))
+    return ordered[0][0]
