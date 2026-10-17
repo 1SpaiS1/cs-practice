@@ -1,33 +1,23 @@
-def parse_record(line: str) -> dict:
-
-
+def parse_record(line):
     parts = line.split(";")
+
     if len(parts) != 3:
-        raise ValueError(
-            f"ожидалось 3 поля через ';', получено {len(parts)}: {line!r}"
-        )
+        raise ValueError("Запись должна содержать три поля")
 
-    city_raw, temp_raw, date_raw = parts
+    city = parts[0].strip()
+    temp = parts[1].strip()
+    date = parts[2].strip()
 
+    if not city:
+        raise ValueError("Город не может быть пустым")
 
-    city = city_raw.strip()
-    date = date_raw.strip()
+    if not date:
+        raise ValueError("Дата не может быть пустой")
 
-
-    if city == "":
-        raise ValueError(f"пустое название города: {line!r}")
-    if date == "":
-        raise ValueError(f"пустая дата: {line!r}")
-
-
-    temp_text = temp_raw.strip()
     try:
-        temperature = float(temp_text)
+        temperature = float(temp)
     except ValueError:
-        raise ValueError(
-            f"температура не является числом: {temp_raw!r}"
-        ) from None
-
+        raise ValueError("Температура должна быть числом")
 
     return {
         "city": city,
@@ -35,46 +25,52 @@ def parse_record(line: str) -> dict:
         "date": date,
     }
 
-def read_valid(lines: list[str]) -> list[dict]:
-
+def read_valid(lines):
     records = []
+
     for line in lines:
-       
-        if line.strip() == "":
+        if not line.strip():
             continue
 
-        
         try:
-            records.append(parse_record(line))
+            record = parse_record(line)
         except ValueError:
             continue
 
+        records.append(record)
+
     return records
 
-def average_by_city(records: list[dict]) -> dict:
-    
-    totals = {}
-    counts = {}
+def average_by_city(records):
+    total = {}
+    count = {}
 
     for record in records:
         city = record["city"]
         temperature = record["temperature"]
-        totals[city] = totals.get(city, 0.0) + temperature
-        counts[city] = counts.get(city, 0) + 1
 
-    averages = {}
-    for city in totals:
-        avg = totals[city] / counts[city]
-        averages[city] = round(avg, 1)
+        total[city] = total.get(city, 0.0) + temperature
+        count[city] = count.get(city, 0) + 1
 
-    return averages
+    return {
+        city: round(total[city] / count[city], 1)
+        for city in total
+    }
 
-    def warmest_city(records: list[dict]) -> str:
-    
+def warmest_city(records):
     averages = average_by_city(records)
-    if not averages:
+
+    if len(averages) == 0:
         return ""
 
-  
-    ordered = sorted(averages.items(), key=lambda kv: (-kv[1], kv[0]))
-    return ordered[0][0]
+    best_city = ""
+
+    for city in averages:
+        if best_city == "":
+            best_city = city
+        elif averages[city] > averages[best_city]:
+            best_city = city
+        elif averages[city] == averages[best_city] and city < best_city:
+            best_city = city
+
+    return best_city
