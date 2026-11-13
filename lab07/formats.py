@@ -10,12 +10,10 @@ def csv_to_records(text: str) -> list[dict]:
     reader = csv.DictReader(f)
     res = []
     for row in reader:
-        d = {} # Явно создаем словарь
+        d = {}
         for k, v in row.items():
             if k is not None:
-                k_clean = k.strip()
-                v_clean = v.strip() if v is not None else ""
-                d[k_clean] = v_clean
+                d[k.strip()] = v.strip() if v is not None else ""
         res.append(d)
     return res
 
@@ -23,6 +21,7 @@ def csv_to_records(text: str) -> list[dict]:
 def _parse_value(val: str):
     val = val.strip()
     low_val = val.lower()
+    
     if low_val in ("true", "yes"):
         return True
     if low_val in ("false", "no"):
@@ -34,13 +33,11 @@ def _parse_value(val: str):
         pass
         
     try:
-       
-        if "." in val and "," not in val:
-            return float(val)
+        
+        return float(val)
     except ValueError:
         pass
         
-    
     return val
 
 
@@ -49,14 +46,17 @@ def parse_settings(lines: list[str]) -> dict:
     current_list_key = None
     
     for line in lines:
+
         clean_line = line.split("#")[0].strip()
         if not clean_line:
             continue
             
+
         if clean_line.startswith("- "):
             if current_list_key is not None:
                 val = clean_line[2:].strip()
                 result[current_list_key].append(_parse_value(val))
+
         elif ":" in clean_line:
             key, val = clean_line.split(":", 1)
             key = key.strip()
