@@ -8,14 +8,12 @@ def csv_to_records(text: str) -> list[dict]:
         return []
     f = io.StringIO(text.strip())
     reader = csv.DictReader(f)
-    res = []
-    for row in reader:
-        d = {}
-        for k, v in row.items():
-            if k is not None:
-                d[k.strip()] = v.strip() if v is not None else ""
-        res.append(d)
-    return res
+    
+    return [
+        {k.strip(): (v.strip() if v is not None else "") 
+         for k, v in row.items() if k is not None}
+        for row in reader
+    ]
 
 
 def _parse_value(val: str):
@@ -33,7 +31,7 @@ def _parse_value(val: str):
         pass
         
     try:
-        
+
         return float(val.replace(",", "."))
     except ValueError:
         pass
@@ -46,17 +44,14 @@ def parse_settings(lines: list[str]) -> dict:
     current_list_key = None
     
     for line in lines:
-
         clean_line = line.split("#")[0].strip()
         if not clean_line:
             continue
             
-
         if clean_line.startswith("- "):
             if current_list_key is not None:
                 val = clean_line[2:].strip()
                 result[current_list_key].append(_parse_value(val))
-
         elif ":" in clean_line:
             key, val = clean_line.split(":", 1)
             key = key.strip()
@@ -73,15 +68,11 @@ def parse_settings(lines: list[str]) -> dict:
 
 
 def merge_by_key(rows: list[dict], extra: dict, key: str = "id") -> list[dict]:
-    result = []
-    for row in rows:
-        key_val = row.get(key)
-        merged_row = {}
-        if key_val in extra:
-            merged_row.update(extra[key_val])
-        merged_row.update(row)
-        result.append(merged_row)
-    return result
+
+    return [
+        {**extra.get(row.get(key), {}), **row}
+        for row in rows
+    ]
 
 
 def records_to_json(records: list[dict]) -> str:
