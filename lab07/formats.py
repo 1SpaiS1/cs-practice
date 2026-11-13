@@ -10,27 +10,28 @@ def csv_to_records(text: str) -> list[dict]:
     reader = csv.DictReader(f)
     records = []
     for row in reader:
-        clean_row = {k.strip(): v.strip() for k, v in row.items() if k is not None}
+ 
+        for k, v in row.items():
+            if k is not None:
+                clean_row[k.strip()] = v.strip() if v is not None else ""
         records.append(clean_row)
     return records
 
 
 def _parse_value(val: str):
-
     low_val = val.lower()
     if low_val in ("true", "yes"):
         return True
     if low_val in ("false", "no"):
         return False
     
-
     try:
         return int(val)
     except ValueError:
         pass
         
-
     try:
+ 
         return float(val)
     except ValueError:
         pass
@@ -44,22 +45,23 @@ def parse_settings(lines: list[str]) -> dict:
     
     for line in lines:
 
-        clean_line = line.split("#")[0].strip()
-        if not clean_line:
+        if "#" in line:
+            line = line.split("#")[0]
+            
+        line = line.strip()
+        if not line:
             continue
             
 
-        if clean_line.startswith("- "):
+        if line.startswith("- "):
             if current_list_key is not None:
-                item = clean_line[2:].strip()
-                result[current_list_key].append(_parse_value(item))
-            continue
-            
+                val = line[2:].strip()
+                result[current_list_key].append(_parse_value(val))
 
-        if ":" in clean_line:
-            key, val = clean_line.split(":", 1)
-            key = key.strip()
-            val = val.strip()
+        elif ":" in line:
+            parts = line.split(":", 1)
+            key = parts[0].strip()
+            val = parts[1].strip()
             
             if val:
                 result[key] = _parse_value(val)
