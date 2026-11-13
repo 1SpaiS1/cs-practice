@@ -6,23 +6,23 @@ import io
 def csv_to_records(text: str) -> list[dict]:
     if not text.strip():
         return []
-    
-
     f = io.StringIO(text.strip())
     reader = csv.DictReader(f)
-    
-    
-    return [
-        {k.strip(): (v.strip() if v is not None else "") 
-         for k, v in row.items() if k is not None}
-        for row in reader
-    ]
+    res = []
+    for row in reader:
+        d = {} # Явно создаем словарь
+        for k, v in row.items():
+            if k is not None:
+                k_clean = k.strip()
+                v_clean = v.strip() if v is not None else ""
+                d[k_clean] = v_clean
+        res.append(d)
+    return res
 
 
 def _parse_value(val: str):
     val = val.strip()
     low_val = val.lower()
-    
     if low_val in ("true", "yes"):
         return True
     if low_val in ("false", "no"):
@@ -34,11 +34,13 @@ def _parse_value(val: str):
         pass
         
     try:
-
-        return float(val.replace(",", "."))
+       
+        if "." in val and "," not in val:
+            return float(val)
     except ValueError:
         pass
         
+    
     return val
 
 
@@ -47,7 +49,6 @@ def parse_settings(lines: list[str]) -> dict:
     current_list_key = None
     
     for line in lines:
-
         clean_line = line.split("#")[0].strip()
         if not clean_line:
             continue
