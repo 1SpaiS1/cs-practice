@@ -22,3 +22,18 @@ def deepest_path(paths: list[str]) -> str:
     deepest = [p for p in paths if p.count("/") == max_depth]
     
     return min(deepest)
+
+def human_size(n_bytes: int) -> str:
+    units = ["Б", "КБ", "МБ", "ГБ", "ТБ"]
+    
+    # Если меньше килобайта — выводим целое число байт
+    if n_bytes < 1024:
+        return f"{n_bytes} {units[0]}"
+    
+    # Для остальных единиц делим на 1024
+    size = float(n_bytes)
+    for unit in units[1:]:
+        size /= 1024.0
+        # Если после деления размер меньше 1024 или это последняя единица (ТБ)
+        if size < 1024.0 or unit == units[-1]:
+            return f"{size:.1f} {unit}"
