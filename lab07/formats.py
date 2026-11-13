@@ -39,7 +39,7 @@ def _parse_value(val: str):
         
     
     try:
-        return float(val.replace(",", "."))
+        return float(val) 
     except ValueError:
         pass
         
