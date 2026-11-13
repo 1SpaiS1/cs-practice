@@ -16,19 +16,21 @@ def csv_to_records(text: str) -> list[dict]:
 
 
 def _parse_value(val: str):
+
     low_val = val.lower()
     if low_val in ("true", "yes"):
         return True
     if low_val in ("false", "no"):
         return False
     
+
     try:
         return int(val)
     except ValueError:
         pass
         
+
     try:
- 
         return float(val)
     except ValueError:
         pass
@@ -49,8 +51,8 @@ def parse_settings(lines: list[str]) -> dict:
 
         if clean_line.startswith("- "):
             if current_list_key is not None:
-                val = clean_line[2:].strip()
-                result[current_list_key].append(_parse_value(val))
+                item = clean_line[2:].strip()
+                result[current_list_key].append(_parse_value(item))
             continue
             
 
