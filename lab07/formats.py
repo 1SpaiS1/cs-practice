@@ -17,6 +17,7 @@ def csv_to_records(text: str) -> list[dict]:
 
 
 def _parse_value(val: str):
+    val = val.strip()
     low_val = val.lower()
     if low_val in ("true", "yes"):
         return True
@@ -29,8 +30,8 @@ def _parse_value(val: str):
         pass
         
     try:
-       
-        return float(val.replace(",", "."))
+   
+        return float(val)
     except ValueError:
         pass
         
@@ -42,6 +43,7 @@ def parse_settings(lines: list[str]) -> dict:
     current_list_key = None
     
     for line in lines:
+
         clean_line = line.split("#")[0].strip()
         if not clean_line:
             continue
