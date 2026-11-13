@@ -6,12 +6,15 @@ import io
 def csv_to_records(text: str) -> list[dict]:
     if not text.strip():
         return []
+    
+
     f = io.StringIO(text.strip())
     reader = csv.DictReader(f)
     
+    
     return [
         {k.strip(): (v.strip() if v is not None else "") 
-         for k, v in row.items() if k is not None} 
+         for k, v in row.items() if k is not None}
         for row in reader
     ]
 
@@ -19,6 +22,7 @@ def csv_to_records(text: str) -> list[dict]:
 def _parse_value(val: str):
     val = val.strip()
     low_val = val.lower()
+    
     if low_val in ("true", "yes"):
         return True
     if low_val in ("false", "no"):
@@ -30,8 +34,8 @@ def _parse_value(val: str):
         pass
         
     try:
-   
-        return float(val)
+
+        return float(val.replace(",", "."))
     except ValueError:
         pass
         
